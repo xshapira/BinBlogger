@@ -50,15 +50,13 @@ def delete_comment(request, cpk, ppk):
     if request.method == 'POST':
         if request.user == comment.author or request.user.is_superuser or request.user == post.author:
             comment.delete()
-            messages.success(request, 'Comment has been deleted.') 
-            return redirect(reverse('post-detail', kwargs={
-                'pk': ppk
-            }))
+            messages.success(request, 'Comment has been deleted.')
         else:
             messages.error(request, 'something went wrong !')
-            return redirect(reverse('post-detail', kwargs={
-                'pk': ppk
-            }))
+
+        return redirect(reverse('post-detail', kwargs={
+            'pk': ppk
+        }))
         
 #delete reply view
 @login_required
@@ -68,12 +66,9 @@ def delete_reply(request, rpk, cpk, ppk):
     if request.method == 'POST':
         if request.user == reply.author or request.user.is_superuser or request.user == post.author:
             reply.delete()
-            messages.success(request, 'Deleted') 
-            return redirect(reverse('post-detail', kwargs={
-                'pk': ppk
-            }))
+            messages.success(request, 'Deleted')
         else:
             messages.error(request, 'something gone wrong !')
-            return redirect(reverse('post-detail', kwargs={
-                'pk': ppk
-            }))
+        return redirect(reverse('post-detail', kwargs={
+            'pk': ppk
+        }))

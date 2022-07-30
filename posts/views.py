@@ -21,7 +21,7 @@ from .models import Category, Post
 User = get_user_model()
 users = User.objects.all()
 posts = Post.objects.all().order_by('-created_on')
-latest_posts = Post.objects.order_by('-created_on')[0:3]
+latest_posts = Post.objects.order_by('-created_on')[:3]
 popular_posts = Post.objects.order_by('-hit_count__hits')[:6]
 categories = Category.objects.all()
 
@@ -63,9 +63,7 @@ class PostUpdateView(SuccessMessageMixin, LoginRequiredMixin, UserPassesTestMixi
 
     def test_func(self):
         post = self.get_object()
-        if self.request.user == post.author or self.request.user.is_superuser:
-            return True
-        return False
+        return bool(self.request.user == post.author or self.request.user.is_superuser)
 
 class PostDeleteView(SuccessMessageMixin, LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
@@ -74,9 +72,7 @@ class PostDeleteView(SuccessMessageMixin, LoginRequiredMixin, UserPassesTestMixi
 
     def test_func(self):
         post = self.get_object()
-        if self.request.user == post.author or self.request.user.is_superuser:
-            return True
-        return False
+        return bool(self.request.user == post.author or self.request.user.is_superuser)
 
 # view for blog/post_details.html
 class PostDetailView(HitCountDetailView):

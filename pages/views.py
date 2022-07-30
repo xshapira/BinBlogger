@@ -17,22 +17,17 @@ User = get_user_model()
 class HomePageView(View):
 
     def get(self, request, *args, **kargs):
-        
-        #  latest post will be deleted later    
-        latest_post = Post.objects.order_by('-created_on')[0:3]
+
+        #  latest post will be deleted later
+        latest_post = Post.objects.order_by('-created_on')[:3]
         popular_post = Post.objects.order_by('-hit_count__hits')[:6]
         categories = Category.objects.all()
-        
+
         posts = Post.objects.all()
-        featured_posts = posts.filter(featured=True).order_by('-updated_on')
-        if featured_posts:
+        if featured_posts := posts.filter(featured=True).order_by('-updated_on'):
             featured_post = featured_posts[0]
         else:
-            if posts:
-                featured_post = posts[len(posts)-1]
-            else:
-                featured_post = None
-
+            featured_post = posts[len(posts)-1] if posts else None
         top3_categories = gen_top_categories(categories, 3)
         tags = gen_tags(posts, 10)
 
@@ -61,10 +56,10 @@ class BlogPageView(ListView):
 
         posts = Post.objects.all()
         categories = Category.objects.all()
-        latest_post = Post.objects.order_by('-created_on')[0:3]
+        latest_post = Post.objects.order_by('-created_on')[:3]
         tags = gen_tags(posts, 10)
         top3_categories = gen_top_categories(categories, 3)
-        
+
         context["latest_post"] = latest_post
         context["categories"] = categories
         context["tags"] = tags

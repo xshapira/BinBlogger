@@ -16,7 +16,7 @@ def get_posts_cats_tags(req=None, tag_count=3, admin=True):
     cat_tup_list, tag_tup_list = [], []
     if admin:
         posts = Post.objects.all().order_by('-created_on')
-        categories = list(set([cat for post in posts for cat in post.categories.all()]))
+        categories = list({cat for post in posts for cat in post.categories.all()})
         tags = gen_tags(posts, tag_count)
         for cat in categories:
                 user_post_count = cat.post_set.all().filter(author=req.user).count()
@@ -27,7 +27,7 @@ def get_posts_cats_tags(req=None, tag_count=3, admin=True):
             tag_tup_list.append(tag_tuple)
     else:
         posts = Post.objects.filter(author=req.user).order_by('-created_on')
-        categories = list(set([cat for post in posts for cat in post.categories.all()]))
+        categories = list({cat for post in posts for cat in post.categories.all()})
         tags = gen_tags(posts, tag_count)
         for cat in categories:
             user_post_count = cat.post_set.all().filter(author=req.user).count()
@@ -36,7 +36,7 @@ def get_posts_cats_tags(req=None, tag_count=3, admin=True):
             tag_posts = Post.objects.filter(tags__icontains=tag).all().filter(author=req.user)
             tag_tuple = (tag, len(tag_posts))
             tag_tup_list.append(tag_tuple)
-        
+
     return posts, cat_tup_list, tag_tup_list
 
 # view for admin Dashboard

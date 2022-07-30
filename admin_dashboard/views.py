@@ -18,9 +18,7 @@ categories = Category.objects.all()
 class AdminDbView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def test_func(self):
-        if self.request.user.is_superuser:
-            return True
-        return False
+        return bool(self.request.user.is_superuser)
 
     def get(self, request, *args, **kargs):
         global users
@@ -28,8 +26,7 @@ class AdminDbView(LoginRequiredMixin, UserPassesTestMixin, View):
         lead_admin = users.filter(is_superuser=True).order_by('date_joined')[0]
 
         posts, _, tag_tup_list = get_posts_cats_tags(request, tag_count=15)
-        featured_posts = posts.filter(featured=True).order_by('-updated_on')
-        if featured_posts:
+        if featured_posts := posts.filter(featured=True).order_by('-updated_on'):
             featured_post = featured_posts[0]
         else:
             featured_post = None
@@ -52,17 +49,13 @@ class ADashAllCategoryView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     context_object_name = 'categories'
 
     def test_func(self):
-        if self.request.user.is_superuser:
-            return True
-        return False
+        return bool(self.request.user.is_superuser)
 
 #  admin dashboard all tags view
 class ADashAllTagView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def test_func(self):
-        if self.request.user.is_superuser:
-            return True
-        return False
+        return bool(self.request.user.is_superuser)
 
     def get(self, request, *args, **kargs):
         posts, cat_tup_list, tag_tup_list = get_posts_cats_tags(request, tag_count=15)
@@ -88,9 +81,7 @@ class ADashAllUserView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return context
 
     def test_func(self):
-        if self.request.user.is_superuser:
-            return True
-        return False
+        return bool(self.request.user.is_superuser)
 
 #  admin dashboard all posts view
 class ADashAllPostsView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -101,9 +92,9 @@ class ADashAllPostsView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        featured_posts = Post.objects.filter(
-            featured=True).order_by('-updated_on')
-        if featured_posts:
+        if featured_posts := Post.objects.filter(featured=True).order_by(
+            '-updated_on'
+        ):
             featured_post = featured_posts[0]
         else:
             featured_post = None
@@ -112,9 +103,7 @@ class ADashAllPostsView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return context
 
     def test_func(self):
-        if self.request.user.is_superuser:
-            return True
-        return False
+        return bool(self.request.user.is_superuser)
 
 # post that will be deleted from admin dashboard -view
 class DeletePostbyAdminView(SuccessMessageMixin, LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -124,9 +113,7 @@ class DeletePostbyAdminView(SuccessMessageMixin, LoginRequiredMixin, UserPassesT
     success_message = 'Successfully deleted.'
 
     def test_func(self):
-        if self.request.user.is_superuser:
-            return True
-        return False
+        return bool(self.request.user.is_superuser)
 
 
 # category that will be deleted from admin dashboard - view
@@ -137,9 +124,7 @@ class DeleteCategorybyAdmin(SuccessMessageMixin, LoginRequiredMixin, UserPassesT
     success_message = 'Successfully Deleted. '
 
     def test_func(self):
-        if self.request.user.is_superuser:
-            return True
-        return False
+        return bool(self.request.user.is_superuser)
 
 # category update view on admin dashboard - view
 class UpdateCategorybyAdmin(SuccessMessageMixin, LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -150,23 +135,17 @@ class UpdateCategorybyAdmin(SuccessMessageMixin, LoginRequiredMixin, UserPassesT
     success_message = 'Updated Successfully.'
 
     def test_func(self):
-        if self.request.user.is_superuser:
-            return True
-        return False
+        return bool(self.request.user.is_superuser)
 
 # super user check fucntion for restricting user -funtion for @user_passes_test decorator
 def super_user_check(user):
-    if user.is_superuser:
-        return True
-    else:
-        return False
+    return bool(user.is_superuser)
 
 # admin's power to make a post to featured post
 @login_required
 @user_passes_test(super_user_check)
 def make_the_post_featured(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    if post:
+    if post := get_object_or_404(Post, pk=pk):
         post.featured = True
         post.save()
         messages.success(request, 'Featured successfully ')
@@ -183,9 +162,9 @@ def admin_dashboard_filter_category_posts_view(request, pk):
     cat_posts = category.post_set.all()
 
     if len(cat_posts) > 0:
-        featured_posts = cat_posts.filter(
-            featured=True).order_by('-updated_on')
-        if featured_posts:
+        if featured_posts := cat_posts.filter(featured=True).order_by(
+            '-updated_on'
+        ):
             featured_post = featured_posts[0]
         else:
             featured_post = None
@@ -213,8 +192,7 @@ def admin_dashboard_filter_tag_posts_view(request, tag):
     users = users.order_by('date_joined')
     _, cat_tup_list, tag_tup_list = get_posts_cats_tags(request, tag_count=10)
 
-    featured_posts = posts.filter(featured=True).order_by('-updated_on')
-    if featured_posts:
+    if featured_posts := posts.filter(featured=True).order_by('-updated_on'):
         featured_post = featured_posts[0]
     else:
         featured_post = None
@@ -238,8 +216,7 @@ def admin_dashboard_filter_user_posts_view(request, username):
     global users
     users = users.order_by('date_joined')
     _, cat_tup_list, tag_tup_list = get_posts_cats_tags(request, tag_count=10)
-    featured_posts = posts.filter(featured=True).order_by('-updated_on')
-    if featured_posts:
+    if featured_posts := posts.filter(featured=True).order_by('-updated_on'):
         featured_post = featured_posts[0]
     else:
         featured_post = None
@@ -267,10 +244,10 @@ def make_user_as_admin(request, username):
         user.save()
         messages.success(request, f'{user.username} is now admin')
 
-        return redirect('admin-dashboard')
     else:
         messages.error(request, 'Error occured !')
-        return redirect('admin-dashboard')
+
+    return redirect('admin-dashboard')
 
 # remove user as admin view
 @login_required
@@ -286,10 +263,10 @@ def remove_user_admin_as_admin(request, username):
         user.is_stuff = False
         user.save()
         messages.success(request, f'{user.username} is removed as admin')
-        return redirect('admin-dashboard')
     else:
         messages.error(request, 'Error occured !')
-        return redirect('admin-dashboard')
+
+    return redirect('admin-dashboard')
 
 # remove user from database view
 @login_required
@@ -301,12 +278,10 @@ def remove_user_from_db(request, pk):
 
     if request.method == 'POST':
         user = get_object_or_404(User, pk=pk)
-        if user != lead_admin and user != request.user:
+        if user not in [lead_admin, request.user]:
             user.delete()
             messages.success(request, f'{user.username} removed successfully')
-            return redirect('admin-dashboard')
         else:
             messages.error(request, 'Error occured !')
-            return redirect('admin-dashboard')
-
+        return redirect('admin-dashboard')
     return render(request, 'admin_dashboard/confirm-delete.html')

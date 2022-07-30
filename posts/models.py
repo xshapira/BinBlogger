@@ -60,11 +60,7 @@ class Post(models.Model):
     
     # preprossesing before save
     def save(self, *args, **kwargs):
-        if not self.tags:
-            self.tags = 'blog,programming'.lower()
-        else:
-            self.tags = self.tags.lower()
-            
+        self.tags = self.tags.lower() if self.tags else 'blog,programming'.lower()
         super(Post, self).save(*args, **kwargs)
         
     # delete thumnail too 

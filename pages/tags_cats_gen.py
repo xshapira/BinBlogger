@@ -10,7 +10,7 @@ def gen_tags(post_list, num=3):
         list: num amount of tags (Defaults 3)
     """
     all_tag_list = [post.tags.split(',') for post in post_list]
-    tags = set([tag.strip() for tags in all_tag_list for tag in tags])
+    tags = {tag.strip() for tags in all_tag_list for tag in tags}
 
     return list(tags)[:num]
 
